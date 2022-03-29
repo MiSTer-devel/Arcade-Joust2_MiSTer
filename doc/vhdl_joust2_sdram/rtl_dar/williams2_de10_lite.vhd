@@ -47,7 +47,9 @@
 --
 ---------------------------------------------------------------------------------
 --  Use make_joust2_proms.bat to build vhd file and bin from binaries
---  Load sdram with external rom bank -> use sdram_loader_de10_lite.sof + key(0)
+--  Load sdram with external rom bank 
+--      ->         use sdram_loader_1_de10_lite.sof + key(0)
+--      -> **and** use sdram_loader_2_de10_lite.sof + key(0)
 ---------------------------------------------------------------------------------
 --  Other details : see williams2.vhd
 ---------------------------------------------------------------------------------
@@ -144,12 +146,21 @@ port (
  
  signal timer     : std_logic_vector( 7 downto 0);
  signal rom_rd    : std_logic;
- signal rom_addr  : std_logic_vector(16 downto 0);
+ signal rom_rd_r  : std_logic;
+ signal rd        : std_logic;
+ signal rom_addr  : std_logic_vector(17 downto 0);
  signal rom_data  : std_logic_vector(15 downto 0);
  signal rom_do    : std_logic_vector( 7 downto 0);
  signal rom_cycle : std_logic_vector( 4 downto 0);
  signal dram_dqm  : std_logic_vector( 1 downto 0);
  signal sdram_data: std_logic_vector(15 downto 0);
+ 
+ signal gfx_rd    : std_logic;
+ signal gfx_rd_r  : std_logic;
+ signal gfx_do    : std_logic_vector(23 downto 0);
+ 
+ signal reading_rom: std_logic;
+
 
 -- signal max3421e_clk : std_logic;
  
@@ -162,10 +173,16 @@ port (
  signal bi        : std_logic_vector(7 downto 0);
  signal csync     : std_logic;
  signal blankn    : std_logic;
- 
- signal audio           : std_logic_vector( 7 downto 0);
- signal pwm_accumulator : std_logic_vector(12 downto 0);
+  
+ signal audio_1         : std_logic_vector( 7 downto 0);
+ signal audio_2         : std_logic_vector( 7 downto 0);
+ signal speech          : std_logic_vector(15 downto 0);
+ signal ym2151_left     : signed(15 downto 0);
+ signal ym2151_right    : signed(15 downto 0);
 
+ signal pwm_accumulator_l : std_logic_vector(12 downto 0);
+ signal pwm_accumulator_r : std_logic_vector(12 downto 0);
+ 
  alias reset_n         : std_logic is key(0);
  alias ps2_clk         : std_logic is gpio(35); --gpio(0);
  alias ps2_dat         : std_logic is gpio(34); --gpio(1);
@@ -227,52 +244,67 @@ port map(
 	sd_cas  => dram_cas_n, -- columns address select
 
 	-- cpu/chipset interface
-	init     => not pll_locked, -- init signal after FPGA config to initialize RAM
+	init     => (not pll_locked) or reset, -- init signal after FPGA config to initialize RAM
 	clk      => clock_120,	    -- sdram is accessed at up to 128MHz
 	
-	addr     => "00000000" & rom_addr, -- 25 bit byte address
+	addr     => "0000000" & (rom_addr and "11"&x"FFFC") , -- 25 bit byte address
 	
 	we       => '0',           -- requests write
 	di       => x"FF",         -- data input
 	
-	rd       => rom_rd,        -- requests data
+	rd       => rd,            -- requests data
 	sm_cycle => rom_cycle      -- state machine cycle
 );
 
+-- demux sdram data
+-- 1 byte  for rom_rd (bank a/b/c/d, prog1/2)
+-- 3 bytes for graphics data
 process (clock_120)
 begin
-	if falling_edge(clock_120) then
-		sdram_data <= dram_dq;
-		if rom_cycle = 8 then
-			rom_data <= sdram_data;
-			if rom_addr(0) = '0' then
-				rom_do <= sdram_data(15 downto 8);
-			else
-				rom_do <= sdram_data( 7 downto 0);
+	if rising_edge(clock_120) then
+		
+		rom_rd_r <= rom_rd;
+		gfx_rd_r <= gfx_rd;
+		
+		if rom_rd = '1' and rom_rd_r = '0' then 
+			reading_rom <= '1';
+			rd <= '1';
+		end if;
+		
+		if gfx_rd = '1' and gfx_rd_r = '0' then 
+			reading_rom <= '0';
+			rd <= '1';
+		end if;
+
+		if (rom_cycle = 12) then
+			reading_rom <= '0';
+			rd <= '0';
+		end if;
+		
+		sdram_data <= dram_dq;		
+				
+		if reading_rom = '1' then 
+			if ((rom_cycle = 7) and (rom_addr(1) = '0'))  or 
+				((rom_cycle = 8) and (rom_addr(1) = '1')) then
+				if rom_addr(0) = '0' then
+					rom_do <= sdram_data(15 downto 8);
+				else
+					rom_do <= sdram_data( 7 downto 0);
+				end if;
 			end if;
 		end if;
+			
+		if reading_rom = '0' then 
+			if (rom_cycle = 7) then
+				gfx_do(23 downto 8) <= sdram_data;
+			end if;			
+			if (rom_cycle = 8) then
+				gfx_do(7 downto 0) <= sdram_data(15 downto 8);
+			end if;			
+		end if;			
+					
 	end if;
 end process;
-
--- dbg read sdram
---process (clock_40)
---begin
---	if reset = '1' then 
---		timer    <= (others => '0');
---		rom_rd <= '0';
---	else
---		if rising_edge(clock_40) then
---			--rom_addr <= sw(9 downto 8)&"0000000" & sw(7 downto 0); 
---			if timer = x"0F" then 				
---				timer <= (others => '0');
---			else
---				timer <= timer +1;			
---			end if;		
---			if timer > 2 then rom_rd <= '1'; end if;
---			if timer > 6 then rom_rd <= '0'; end if;			
---		end if;
---	end if;
---end process;
 
 -- Williams2
 
@@ -285,6 +317,10 @@ port map(
  rom_do   => rom_do,
  rom_rd   => rom_rd,
  
+ gfx_do   => gfx_do,
+ gfx_rd   => gfx_rd,
+ 
+
 -- tv15Khz_mode => tv15Khz_mode,
  video_r      => r,
  video_g      => g,
@@ -294,8 +330,13 @@ port map(
  video_blankn => blankn,
  video_hs     => open, --hsync, -- not tested
  video_vs     => open, --vsync, -- not tested
- audio_out    => audio,
-
+ 
+ audio_1      => audio_1,
+ audio_2      => audio_2,
+ speech       => speech,
+ ym2151_left  => ym2151_left,
+ ym2151_right => ym2151_right,
+ 
  btn_advance          => keys_HUA(0),
  btn_auto_up          => keys_HUA(1),
  btn_high_score_reset => keys_HUA(2),
@@ -474,16 +515,30 @@ hex5 <= seven_seg;
 -- sw => sw(7 downto 0)
 --);
 
--- pwm sound output
+-- pwm sound output (rough mux)
 process(clock_12)  -- use same clock as sound_board
 begin
+
   if rising_edge(clock_12) then
-    pwm_accumulator  <=  std_logic_vector(unsigned('0' & pwm_accumulator(11 downto 0)) + unsigned('0' & audio & "00"));
+		pwm_accumulator_l  <=  std_logic_vector(
+			unsigned('0' & pwm_accumulator_l(11 downto 0))
+			+ unsigned('0' & ym2151_left(15 downto 6))
+			+ unsigned('0' & speech(15 downto 6))
+         + unsigned('0' & audio_1 & "00")
+         + unsigned('0' & audio_2 & "00"));
+			
+		pwm_accumulator_r  <=  std_logic_vector(
+			unsigned('0' & pwm_accumulator_r(11 downto 0))
+			+ unsigned('0' & ym2151_right(15 downto 6))
+			+ unsigned('0' & speech(15 downto 6))
+         + unsigned('0' & audio_1 & "00")
+         + unsigned('0' & audio_2 & "00"));
   end if;
+  
 end process;
 
-pwm_audio_out_l <= pwm_accumulator(12);
-pwm_audio_out_r <= pwm_accumulator(12); 
+pwm_audio_out_l <= pwm_accumulator_l(12);
+pwm_audio_out_r <= pwm_accumulator_r(12); 
 
 
 end struct;

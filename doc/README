@@ -19,6 +19,15 @@
 -- 6800/01 compatible CPU core 
 -- GNU public license - December 2002 : John E. Kent
 -------------------------------------------------------------------------------
+-- MC6809
+-- Copyright (c) 2016, Greg Miller
+---------------------------------------------------------------------------------
+-- HC55516/HC55564 Continuously Variable Slope Delta decoder
+-- (c)2015 vlait
+---------------------------------------------------------------------------------
+-- JT51 (YM2151). <http://www.gnu.org/licenses/>.
+-- Author: Jose Tejada Gomez. Twitter: @topapate
+---------------------------------------------------------------------------------
 -- Educational use only
 -- Do not redistribute synthetized file with roms
 -- Do not redistribute roms whatever the form
@@ -38,6 +47,8 @@
 --            17,18  -  gnd   -  8,10 
 --
 -------------------------------------------------------------------------------
+-- Version 1.0 -- 28/03/2022 -- 
+--      add speech board (required loader 1 and loader 2 steps)
 -- Version 0.0 -- 05/03/2022 -- 
 --	initial version 
 -------------------------------------------------------------------------------
@@ -79,12 +90,17 @@
 -- Use make_joust2_proms.bat to build vhd file and bin from binaries
 -- Load sdram with external rom bank -> use sdram_loader_de10_lite.sof + key(0)
 -------------------------------------------------------------------------------
--- Program sdram content with this joust2 rom bank loader before 
--- programming joust2 game core :
+-- Program sdram content with the 2 joust2 rom loader before programming joust2 
+-- game core
 --
--- 1) program DE10_lite with joust2 sdram loader
+-- 1) program DE10_lite with joust2 sdram loader 1
 -- 2) press key(0) at least once (digit blinks during programming)
--- 3) program DE10_lite with joust2 core without switching DE10_lite OFF
+
+-- 3) program DE10_lite with joust2 sdram loader 2
+-- 4) press key(0) at least once (digit blinks during programming)
+
+-- 5) program DE10_lite with joust2 core without switching DE10_lite OFF
+--
 -------------------------------------------------------------------------------
 -- Used ROMs by make_joust2_proms.bat
 
@@ -132,6 +148,15 @@
 
 > joust2_decoder
    vid_82s147a_ic60_a-5282-10292.12f CRC(0ea3f7fb)
+
+> joust2_bg_sound_bank_a
+    snd_27256_rom23_rev1.u4   CRC(3af6b47d) IC_U4
+
+> joust2_bg_sound_bank_b
+    snd_27256_rom24_rev1.u19  CRC(e7f9ed2e) IC_U19
+
+> joust2_bg_sound_bank_c
+    snd_27256_rom25_rev1.u20  CRC(c85b29f7) IC_U20
 
 -------------------------------------------------------------------------------
 -- Misc. info

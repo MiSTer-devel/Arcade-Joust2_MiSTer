@@ -17,3 +17,7 @@ make_vhdl_prom vid_27128_ic58_rom21_rev1.9f joust2_graph2.vhd
 make_vhdl_prom vid_27128_ic41_rom22_rev1.9d joust2_graph3.vhd
 
 make_vhdl_prom vid_82s147a_ic60_a-5282-10292.12f joust2_decoder.vhd
+
+make_vhdl_prom snd_27256_rom23_rev1.u4  joust2_bg_sound_bank_a.vhd
+make_vhdl_prom snd_27256_rom24_rev1.u19 joust2_bg_sound_bank_b.vhd
+make_vhdl_prom snd_27256_rom25_rev1.u20 joust2_bg_sound_bank_c.vhd

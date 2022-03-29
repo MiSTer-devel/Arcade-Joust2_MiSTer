@@ -33,7 +33,7 @@
 --
 ---------------------------------------------------------------------------------
 --  Use make_joust2_proms.bat to build vhd file and bin from binaries
---  Load sdram with external rom bank -sdram_loader_de10_lite.sof-
+--  Load sdram with external rom bank -sdram_loader 1 and 2 de10_lite.sof
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 -- see joust2 settings whithin joust2_cmos_ram.vhd
@@ -49,9 +49,11 @@ port(
  clock_12     : in std_logic;
  reset        : in std_logic;
  
- rom_addr     : out std_logic_vector(16 downto 0);
- rom_do       : in  std_logic_vector( 7 downto 0);
+ rom_addr     : out std_logic_vector(17 downto 0); -- muxed addresses to external (d)ram
+ rom_do       : in  std_logic_vector( 7 downto 0); -- banked rom a/b/c/d, prog 1/2
  rom_rd       : out std_logic;
+ gfx_rd       : out std_logic;
+ gfx_do       : in  std_logic_vector(23 downto 0);  -- graph 1/2/3
  
 -- tv15Khz_mode : in std_logic;
  video_r        : out std_logic_vector(3 downto 0);
@@ -63,7 +65,11 @@ port(
  video_hs       : out std_logic;
  video_vs       : out std_logic;
  
- audio_out      : out std_logic_vector(7 downto 0);
+ audio_1        : out std_logic_vector(7 downto 0);
+ audio_2        : out std_logic_vector( 7 downto 0);
+ speech         : out std_logic_vector(15 downto 0);
+ ym2151_left    : out signed (15 downto 0);
+ ym2151_right   : out signed (15 downto 0);
   
  btn_auto_up          : in std_logic;
  btn_advance          : in std_logic; 
@@ -205,6 +211,7 @@ architecture struct of williams2 is
 
  signal fg_pixels   : std_logic_vector(23 downto 0);
  signal fg_pixels_0 : std_logic_vector( 3 downto 0);
+ signal fg_pixels_1 : std_logic_vector( 3 downto 0);
  signal bg_pixels   : std_logic_vector(23 downto 0);
  signal bg_pixels_0 : std_logic_vector( 3 downto 0);
  signal bg_pixels_1 : std_logic_vector( 3 downto 0);
@@ -251,12 +258,10 @@ architecture struct of williams2 is
  signal cpu_ba      : std_logic;
  signal cpu_bs      : std_logic;
  
--- signal gun_bin_code  : std_logic_vector(5 downto 0);
--- signal gun_gray_code : std_logic_vector(5 downto 0);
-
  signal sound_select : std_logic_vector(7 downto 0);
  signal sound_trig   : std_logic;
  signal sound_ack    : std_logic;
+ signal sound_trig_2 : std_logic; -- cvsd board trigger
  
  signal sound_cpu_addr : std_logic_vector(15 downto 0);
 
@@ -286,7 +291,7 @@ begin
 			
 		if pixel_cnt = "000" then en_cpu <= '1';       end if;
 		if pixel_cnt = "001" then rom_rd <= '1';       end if;
-		if pixel_cnt = "011" then video_access <= '1'; end if;			
+		if pixel_cnt = "010" then video_access <= '1'; end if;			
 		if pixel_cnt = "100" then graph_access <= '1'; end if;
 	
 		if en_pixel = '1' then 		
@@ -376,6 +381,7 @@ begin
 			else 
 				fg_pixels_0 <= fg_pixels( 3 downto  0);
 			end if;
+			fg_pixels_1 <= fg_pixels_0;
 
 		end if;
 	end if;
@@ -391,11 +397,11 @@ bg_pixels_shifted <=
 	bg_pixels_2 when "101",
 	bg_pixels_1 when "110",
 	bg_pixels_0 when others;
-	
+		
 --	mux bus addr and pixels data to palette addr
 palette_addr <=
 	addr_bus(10 downto 1) when color_cs = '1' else 
-	fg_color_bank & fg_pixels_0 when fg_pixels_0 /= x"0" else
+	fg_color_bank & fg_pixels_1 when fg_pixels_1 /= x"0" else
 	bg_color_bank(5 downto 0) & bg_pixels_shifted;
 --	bg_color_bank(5 downto 3) & vcnt(7 downto 5) & bg_pixels_shifted;
 	
@@ -411,8 +417,13 @@ video_i <= palette_hi_do(7 downto 4);
 --video_b <= bg_pixels(20) & bg_pixels(20) & "00" when fg_pixels(23 downto 20) = x"0" else fg_pixels(20) & fg_pixels(20) & "00";
 --video_i <= x"F";
 
+
+-- read graph 1/2/3 from external (d)ram
+gfx_rd <= graph_access;
+
 ---- 24 bits pixels shift register
 ---- 6 pixels of 4 bits
+
 process (clock_12) 
 begin
 	if rising_edge(clock_12) then 
@@ -433,7 +444,8 @@ begin
 			
 			if graph_access = '1' then
 				flip_bg <= flip_bg_a;
-				bg_pixels <= graph1_do & graph2_do & graph3_do;
+--				bg_pixels <= graph1_do & graph2_do & graph3_do;
+				bg_pixels <= gfx_do;  -- graph 1/2/3
 			else
 				if flip_bg = '0' then 
 					bg_pixels <= bg_pixels(19 downto 0) & X"0";
@@ -502,17 +514,22 @@ vram_h0_we  <= '1' when vram_we = '1' and blit_wr_inh_h = '0' and decod_do(7 dow
 vram_h1_we  <= '1' when vram_we = '1' and blit_wr_inh_h = '0' and decod_do(7 downto 6)  = "01" else '0';
 vram_h2_we  <= '1' when vram_we = '1' and blit_wr_inh_h = '0' and decod_do(7 downto 6)  = "10" else '0';
 
--- mux banked rom address to external (d)ram
-rom_addr <= "00"&addr_bus(14 downto 0) when (page = "010"                ) else -- bank a
-				"01"&addr_bus(14 downto 0) when (page = "110"                ) else -- bank b
-				"10"&addr_bus(14 downto 0) when (page = "001" or page = "011") else -- bank c
-				"11"&addr_bus(14 downto 0) when (page = "100" or page = "101") else -- bank d
-				"00"&addr_bus(14 downto 0);                                         -- bank a
+-- mux banked rom / prog 1 / prog 2 and graph rom address to external (d)ram
+-- retreived data loaded with loader 1 and loader 2
+rom_addr <= "000"&addr_bus(14 downto 0) when (page = "010"                ) and (pixel_cnt< 3) and (addr_bus(15)='0') else -- bank a
+				"001"&addr_bus(14 downto 0) when (page = "110"                ) and (pixel_cnt< 3) and (addr_bus(15)='0') else -- bank b
+				"010"&addr_bus(14 downto 0) when (page = "001" or page = "011") and (pixel_cnt< 3) and (addr_bus(15)='0') else -- bank c
+				"011"&addr_bus(14 downto 0) when (page = "100" or page = "101") and (pixel_cnt< 3) and (addr_bus(15)='0') else -- bank d
+				"10010" &addr_bus(12 downto 0) when (pixel_cnt< 3) and (addr_bus(15 downto 12) >= X"E") else -- prog2
+				"100000"&addr_bus(11 downto 0) when (pixel_cnt< 3) and (addr_bus(15 downto 12) >= X"D") else -- prog1
+				"11"&graph_addr&"00"; -- graph 1/2/3
 
 -- mux data bus between cpu/blitter/roms/io/vram
 data_bus_high <=
-	rom_prog2_do            when addr_bus(15 downto 12) >= X"E" else -- 8K
-	rom_prog1_do            when addr_bus(15 downto 12) >= X"D" else -- 4K	
+	rom_do                  when addr_bus(15 downto 12) >= X"E" else -- 8K
+	rom_do                  when addr_bus(15 downto 12) >= X"D" else -- 4K	
+--	rom_prog2_do            when addr_bus(15 downto 12) >= X"E" else -- 8K
+--	rom_prog1_do            when addr_bus(15 downto 12) >= X"D" else -- 4K	
 	vcnt(7 downto 0)        when addr_bus(15 downto  4)  = X"CBE" else
 	map_do                  when addr_bus(15 downto 11)  = X"C"&'0' else
 	x"0"&cmos_do            when addr_bus(15 downto 10)  = X"C"&"11" else
@@ -981,15 +998,6 @@ port map(
  data => decod_do
 );
 
--- gun gray code encoder
---gun_gray_encoder : entity work.gray_code
---port map(
--- clk  => clock_12,
--- addr => gun_bin_code,
--- data => gun_gray_code
---);
-
-
 -- pia iO1 : ic6 (5C)
 pia_io1 : entity work.pia6821
 port map
@@ -1037,7 +1045,7 @@ port map
 	pa_oe       => open,
 	ca1       	=> cnt_4ms, -- '0',
 	ca2_i      	=> '0',
-	ca2_o       => open,
+	ca2_o       => sound_trig_2,
 	ca2_oe      => open,
 	pb_i      	=> (others => '0'),
 	pb_o        => sound_select,
@@ -1123,9 +1131,28 @@ port map(
  sound_select  => sound_select,
  sound_trig    => sound_trig, 
  sound_ack     => sound_ack,
- audio_out     => audio_out,
+ audio_out     => audio_1,
  
  dbg_cpu_addr  => sound_cpu_addr
 );
+
+-- Williams cvsd board
+williams2 : entity work.williams_cvsd_board
+port map(
+ clock_12     => clock_12,
+ reset        => reset,
+ 
+ sound_select => sound_select,
+ sound_trig   => sound_trig_2,
+
+ audio        => audio_2,
+ speech       => speech,
+ ym2151_left  => ym2151_left,
+ ym2151_right => ym2151_right,
+
+ dbg_out => open
+
+);
+
 
 end struct;
