@@ -303,7 +303,17 @@ wire m_pause   = joy[8];
 // DISPLAY
 wire hblank, vblank;
 wire hs, vs;
-wire [3:0] r,g,b;
+wire [3:0] r,g,b,intensity;
+wire [3:0] red,green,blue;
+wire [7:0] ri,gi,bi;
+
+assign ri = r*intensity;
+assign gi = g*intensity;
+assign bi = b*intensity;
+
+assign red = ri[7:4];
+assign blue = bi[7:4];
+assign green = gi[7:4];
 
 reg ce_pix;
 always @(posedge clk_48) begin
@@ -324,7 +334,7 @@ arcade_video #(256,12,1) arcade_video
 
 	.clk_video(clk_48),
 
-	.RGB_in({r,g,b}),
+	.RGB_in({red,green,blue}),
 	.HBlank(hblank),
 	.VBlank(vblank),
 	.HSync(~hs),
@@ -348,10 +358,10 @@ williams2 williams2
 	.dn_data(ioctl_dout),
 	.dn_wr(ioctl_wr && ioctl_index==0),
 
-	.video_r(r), // [3:0]
-	.video_g(g), // [3:0]
-	.video_b(b), // [3:0]
-	.video_i(),  // [3:0] still not sure what this does, video intensity?
+	.video_r(r),
+	.video_g(g),
+	.video_b(b),
+	.video_i(intensity),
 	.video_hblank(hblank),
 	.video_vblank(vblank),
 	.video_hs(hs),
