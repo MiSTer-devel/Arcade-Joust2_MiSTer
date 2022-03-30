@@ -8,7 +8,7 @@ Ported to MiSTer by [birdybro](https://github.com/birdybro)
 
 ## Description
 
-This is a simulation model of the **Joust 2: Survival of the Fittest** hardware. This is currently an early work in progress as a port.
+This is a simulation model of the **Joust 2: Survival of the Fittest** hardware.
 
 Original source is located in `doc/`
 
@@ -42,15 +42,13 @@ High Score reset is another internal button, and it makes the game pause for a s
 * Both revisions of Joust 2: Survival of the Fittest load and play fine.
 * Regular sound effects play fine.
 * 2 Player controls work.
-* Sometimes audio bugs out, not sure why yet.
 
 ## To-Do
 
-* No Speech synthesis or Music yet. Dar is working on it.
-* Video_i not implemented.
+* No Speech synthesis or Music yet.
 * Pause not implemented.
 * HiScore saving not implemented yet.
-* MiSTer DIP system not implemented yet (DIPS are defined away as CPU behavior currently in the PIA)
+* MiSTer DIP system not implemented yet (DIPS are defined away as CPU behavior currently in the PIA due to them not being a standard DIP system)
 * Adjust video output for HDMI, it is up and to the right a line or two.
 
 ## ROM Files Instructions
