@@ -218,7 +218,7 @@ localparam CONF_STR = {
 	"OC,High Score Reset,Off,On;",
 	"-;",
 	"R0,Reset;",
-	"J1,Flap,Start 1P,Start 2P,Coin,Pause;",
+	"J1,Flap,Transform(Start),Coin;",
 	"jn,A,Start,Select,R,L;",
 	"V,v",`BUILD_DATE 
 };
@@ -290,15 +290,14 @@ wire reset = RESET | status[0] | buttons[1] | ioctl_download;
 wire m_left_1  = joy1[1];
 wire m_right_1 = joy1[0];
 wire m_flap_1  = joy1[4];
+wire m_start1  = joy1[5];
 
 wire m_left_2  = joy2[1];
 wire m_right_2 = joy2[0];
 wire m_flap_2  = joy2[4];
+wire m_start2  = joy2[5];
 
-wire m_start1  = joy[5];
-wire m_start2  = joy[6];
-wire m_coin    = joy[7];
-wire m_pause   = joy[8];
+wire m_coin    = joy[6];
 
 // DISPLAY
 wire hblank, vblank;
