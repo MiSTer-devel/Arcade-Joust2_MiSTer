@@ -6,7 +6,6 @@ set_global_assignment -name VHDL_FILE rtl/cpu68_2.vhd
 set_global_assignment -name VHDL_FILE rtl/decodeur_7_seg.vhd
 set_global_assignment -name VHDL_FILE rtl/dpram.vhd
 set_global_assignment -name VHDL_FILE rtl/gen_ram.vhd
-set_global_assignment -name VHDL_FILE rtl/hc55564.vhd
 set_global_assignment -name VHDL_FILE rtl/joust2_cmos_ram.vhd
 set_global_assignment -name VHDL_FILE rtl/joust2_sound_board.vhd
 set_global_assignment -name VHDL_FILE rtl/pia6821.vhd
