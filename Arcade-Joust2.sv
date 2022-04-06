@@ -195,8 +195,8 @@ assign LED_USER  = ioctl_download;
 
 wire [1:0] ar = status[9:8];
 
-assign VIDEO_ARX = (!ar) ? (status[2] ? 8'd4 : 8'd3) : (ar - 1'd1);
-assign VIDEO_ARY = (!ar) ? (status[2] ? 8'd3 : 8'd4) : 12'd0;
+assign VIDEO_ARX = (!ar) ? (status[2] ? 9'd282 : 9'd241) : (ar - 1'd1);
+assign VIDEO_ARY = (!ar) ? (status[2] ? 9'd241 : 9'd282) : 12'd0;
 
 // Status Bit Map:
 //              Upper                          Lower
@@ -344,7 +344,7 @@ wire flip       = 0;
 
 screen_rotate screen_rotate (.*);
 
-arcade_video #(256,24) arcade_video
+arcade_video #(313,24,1) arcade_video
 (
 	.*,
 

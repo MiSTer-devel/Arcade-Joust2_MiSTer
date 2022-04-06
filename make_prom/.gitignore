@@ -1,9 +1,0 @@
-# Ignore everything in here to avoid copyrighted rom uploads
-*
-*/
-
-# Don't ignore committing the following files
-!.gitignore
-!_unzip_joust2zip_here
-!make_vhdl_prom.exe
-!runme.bat
