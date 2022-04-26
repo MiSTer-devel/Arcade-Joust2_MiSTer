@@ -63,10 +63,8 @@ port(
 	video_g              : out std_logic_vector( 3 downto 0);
 	video_b              : out std_logic_vector( 3 downto 0);
 	video_i              : out std_logic_vector( 3 downto 0);
-	video_csync          : out std_logic;
 	video_hblank         : out std_logic;
 	video_vblank         : out std_logic;
-	video_blankn         : out std_logic;
 	video_hs             : out std_logic;
 	video_vs             : out std_logic;
 
@@ -802,8 +800,6 @@ port map(
 --  data => rom_prog1_do
 -- );
 
--- cpu_2732_ic55_rom2_rev1.4c (08b0d5bd)
--- maincpu 34000-34FFF
 rom_prog1_cs <= '1' when dn_addr(17 downto 12) = "111101" else '0';
 prog1_rom : work.dpram generic map (8,12)
 port map
@@ -825,8 +821,6 @@ port map
 -- 	data => rom_prog2_do
 -- );
 
--- cpu_2732_ic9_rom3_rev2.4d (951175ce) + cpu_2732_ic10_rom4_rev2.4f (ba6e0f6c)
--- maincpu 30000-31FFF
 rom_prog2_cs <= '1' when dn_addr(17 downto 13) = "11000" else '0';
 prog2_rom : work.dpram generic map (8,13)
 port map
@@ -850,9 +844,6 @@ port map
 -- 	data => rom_bank_a_do
 -- );
 
--- cpu_2732_ic26_rom19_rev1.10j (4ef5e805) + cpu_2732_ic24_rom17_rev1.10h (4861f063) +
--- cpu_2732_ic22_rom15_rev1.9j  (421aafa8) + cpu_2732_ic20_rom13_rev1.9h  (3432ff55)
--- maincpu 10000-17FFF
 rom_bank_a_cs <= '1' when dn_addr(17 downto 15) = "010" else '0';
 bank_a_rom : work.dpram generic map (8,15)
 port map
@@ -875,9 +866,6 @@ port map
 -- 	data => rom_bank_b_do
 -- );
 
--- cpu_2732_ic25_rom18_rev1.10i (47580af5) + cpu_2732_ic23_rom16_rev1.10g (869b5942) +
--- cpu_2732_ic21_rom14_rev1.9i (0bbd867c) + cpu_2732_ic19_rom12_rev1.9g (b9221ed1)
--- maincpu 18000-1FFFF
 rom_bank_b_cs <= '1' when dn_addr(17 downto 15) = "011" else '0';
 bank_b_rom : work.dpram generic map (8,15)
 port map
@@ -900,9 +888,6 @@ port map
 -- 	data => rom_bank_c_do
 -- );
 
--- cpu_2732_ic18_rom11_rev1.8j (9dc986f9) + cpu_2732_ic16_rom9_rev2.8h (56e2b550) +
--- cpu_2732_ic14_rom7_rev2.6j  (f3bce576) + cpu_2732_ic12_rom5_rev2.6h (5f8b4919)
--- maincpu 20000-27FFF
 rom_bank_c_cs <= '1' when dn_addr(17 downto 15) = "100" else '0';
 bank_c_rom : work.dpram generic map (8,15)
 port map
@@ -925,8 +910,6 @@ port map
 -- 	data => rom_bank_d_do
 -- );
 
--- cpu_2732_ic17_rom10_rev1.8i (3e01b597) + cpu_2732_ic15_rom8_rev1.8g (ff26fb29) + cpu_2732_ic13_rom6_rev2.6i (5f107db5)
--- maincpu 28000-2DFFF + padding 2E000-2FFFF
 rom_bank_d_cs <= '1' when dn_addr(17 downto 15) = "101" else '0';
 bank_d_rom : work.dpram generic map (8,15)
 port map
@@ -949,8 +932,6 @@ port map
 --  data => graph1_do
 -- );
 
--- vid_27128_ic57_rom20_rev1.8f (572c6b01)
--- gfx1 0-3FFF
 rom_graph1_cs <= '1' when dn_addr(17 downto 14) = "0000" else '0';
 graph1_rom : work.dpram generic map (8,14)
 port map
@@ -973,8 +954,6 @@ port map
 --  data => graph2_do
 -- );
 
--- vid_27128_ic58_rom21_rev1.9f (aa94bf05)
--- gfx1 4000-7FFF
 rom_graph2_cs <= '1' when dn_addr(17 downto 14) = "0001" else '0';
 graph2_rom : work.dpram generic map (8,14)
 port map
@@ -997,8 +976,6 @@ port map
 --  data => graph3_do
 -- );
 
--- vid_27128_ic41_rom22_rev1.9d (c41e3daa)
--- gfx1 8000-BFFF
 rom_graph3_cs <= '1' when dn_addr(17 downto 14) = "0010" else '0';
 graph3_rom : work.dpram generic map (8,14)
 port map
@@ -1012,7 +989,6 @@ port map
 	addr_b => graph_addr,
 	q_b    => graph3_do
 );
--- padding in MRA C000-FFFF for start of joust2_bank_a above
 
 -- cpu/video wram low 0 - IC102-105
 cpu_video_ram_l0 : entity work.gen_ram
@@ -1136,16 +1112,6 @@ port map(
 	q    => cmos_do
 );
 
--- -- addr bus to video addr decoder - IC60
--- video_addr_decoder : entity work.joust2_decoder
--- port map(
--- 	clk  => clock_12,
--- 	addr => decod_addr,
--- 	data => decod_do
--- );
-
--- vid_82s147a_ic60_a-5282-10292.12f (0ea3f7fb)
--- proms 35000-351FF (end of MRA)
 rom_decoder_cs <= '1' when dn_addr(17 downto 9) = "111111000" else '0';
 video_addr_decoder : work.dpram generic map (8,9)
 port map
@@ -1159,16 +1125,6 @@ port map
 	addr_b => decod_addr,
 	q_b    => decod_do
 );
-
-
--- gun gray code encoder
---gun_gray_encoder : entity work.gray_code
---port map(
--- clk  => clock_12,
--- addr => gun_bin_code,
--- data => gun_gray_code
---);
-
 
 -- pia iO1 : ic6 (5C)
 pia_io1 : entity work.pia6821
@@ -1229,8 +1185,6 @@ port map
 );
 
 -- video syncs and blanks
-video_csync <= csync;
-
 video_hblank <= hblank;
 video_vblank <= vblank;
 
@@ -1246,7 +1200,6 @@ begin
 			hsync0 <= '1';
 		end if;
 
-	-- Removed for MiSTer
 	if    hcnt = hcnt_base+0     then hsync1 <= '0';
 	elsif hcnt = hcnt_base+3     then hsync1 <= '1';
 	elsif hcnt = hcnt_base+32-64 then hsync1 <= '0';
@@ -1269,18 +1222,6 @@ begin
 		end if;
 	end if;
 
-	--   Removed for MiSTer
-	if    vsync_cnt = 0 then csync <= hsync1;
-	elsif vsync_cnt = 1 then csync <= hsync1;
-	elsif vsync_cnt = 2 then csync <= hsync1;
-	elsif vsync_cnt = 3 then csync <= hsync2;
-	elsif vsync_cnt = 4 then csync <= hsync2;
-	elsif vsync_cnt = 5 then csync <= hsync2;
-	elsif vsync_cnt = 6 then csync <= hsync1;
-	elsif vsync_cnt = 7 then csync <= hsync1;
-	elsif vsync_cnt = 8 then csync <= hsync1;
-	else                     csync <= hsync0;
-	end if;
 
 	if    hcnt = 48 and pixel_cnt = 3 then
 		hblank <= '1';
@@ -1294,8 +1235,6 @@ begin
 		vblank <= '0'; 
 	end if;
 
-	-- external sync and blank outputs
-	video_blankn <= not (hblank or vblank);
 
 	video_hs <= hsync0;
 	

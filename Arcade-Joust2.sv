@@ -333,7 +333,7 @@ end
 
 reg ce_pix;
 always @(posedge clk_48) begin
-	reg [1:0] div;
+	reg [2:0] div;
 	div <= div + 1'd1;
 	ce_pix <= !div;
 end
@@ -380,7 +380,6 @@ williams2 williams2
 	.video_i(intensity),
 	.video_hblank(hblank),
 	.video_vblank(vblank),
-	.video_blankn(!hblank | !vblank),
 	.video_hs(hs),
 	.video_vs(vs),
 
