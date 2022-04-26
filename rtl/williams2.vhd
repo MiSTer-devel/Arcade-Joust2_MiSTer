@@ -63,10 +63,8 @@ port(
 	video_g              : out std_logic_vector( 3 downto 0);
 	video_b              : out std_logic_vector( 3 downto 0);
 	video_i              : out std_logic_vector( 3 downto 0);
-	video_csync          : out std_logic;
 	video_hblank         : out std_logic;
 	video_vblank         : out std_logic;
-	video_blankn         : out std_logic;
 	video_hs             : out std_logic;
 	video_vs             : out std_logic;
 
@@ -1229,8 +1227,6 @@ port map
 );
 
 -- video syncs and blanks
-video_csync <= csync;
-
 video_hblank <= hblank;
 video_vblank <= vblank;
 
@@ -1270,16 +1266,16 @@ begin
 	end if;
 
 	--   Removed for MiSTer
-	if    vsync_cnt = 0 then csync <= hsync1;
-	elsif vsync_cnt = 1 then csync <= hsync1;
-	elsif vsync_cnt = 2 then csync <= hsync1;
-	elsif vsync_cnt = 3 then csync <= hsync2;
-	elsif vsync_cnt = 4 then csync <= hsync2;
-	elsif vsync_cnt = 5 then csync <= hsync2;
-	elsif vsync_cnt = 6 then csync <= hsync1;
-	elsif vsync_cnt = 7 then csync <= hsync1;
-	elsif vsync_cnt = 8 then csync <= hsync1;
-	else                     csync <= hsync0;
+	if    vsync_cnt = 0 then hblank <= hsync1;
+	elsif vsync_cnt = 1 then hblank <= hsync1;
+	elsif vsync_cnt = 2 then hblank <= hsync1;
+	elsif vsync_cnt = 3 then hblank <= hsync2;
+	elsif vsync_cnt = 4 then hblank <= hsync2;
+	elsif vsync_cnt = 5 then hblank <= hsync2;
+	elsif vsync_cnt = 6 then hblank <= hsync1;
+	elsif vsync_cnt = 7 then hblank <= hsync1;
+	elsif vsync_cnt = 8 then hblank <= hsync1;
+	else                     hblank <= hsync0;
 	end if;
 
 	if    hcnt = 48 and pixel_cnt = 3 then
@@ -1295,7 +1291,7 @@ begin
 	end if;
 
 	-- external sync and blank outputs
-	video_blankn <= not (hblank or vblank);
+	-- video_blankn <= not (hblank or vblank);
 
 	video_hs <= hsync0;
 	

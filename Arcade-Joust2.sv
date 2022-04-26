@@ -380,7 +380,6 @@ williams2 williams2
 	.video_i(intensity),
 	.video_hblank(hblank),
 	.video_vblank(vblank),
-	.video_blankn(!hblank | !vblank),
 	.video_hs(hs),
 	.video_vs(vs),
 
