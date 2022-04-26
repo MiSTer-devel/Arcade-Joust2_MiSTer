@@ -5,11 +5,11 @@
   <bootleg>no</bootleg>
   <version></version>
   <alternative></alternative>
-  <platform></platform>
-  <series></series>
+  <platform>Williams 2nd Generation</platform>
+  <series>Joust 2</series>
   <year>1986</year>
   <manufacturer>Williams</manufacturer>
-  <category></category>
+  <category>Platform</category>
 
   <setname>joust2</setname>
   <parent>joust2</parent>
@@ -22,9 +22,9 @@
   <flip></flip>
 
   <players>2</players>
-  <joystick></joystick>
+  <joystick>8-way</joystick>
   <special_controls></special_controls>
-  <num_buttons></num_buttons>
+  <num_buttons>2</num_buttons>
   <button_names></button_names>
 
   <rom index="0" zip="joust2.zip" md5="none" type="merged">
@@ -89,5 +89,7 @@
     <part crc="0ea3f7fb" name="vid_82s147a_ic60_a-5282-10292.12f"/>
 
   </rom>
+  
+  <mratimestamp>20220426031332</mratimestamp>
 
 </misterromdescription>
