@@ -968,6 +968,14 @@ port map
 	q_b    => graph2_do
 );
 
+-- -- rom20.ic41
+-- graph3_rom : entity work.joust2_graph3
+-- port map(
+--  clk  => clock_12,
+--  addr => graph_addr,
+--  data => graph3_do
+-- );
+
 rom_graph3_cs <= '1' when dn_addr(17 downto 14) = "0010" else '0';
 graph3_rom : work.dpram generic map (8,14)
 port map
