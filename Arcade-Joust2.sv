@@ -209,15 +209,15 @@ assign VIDEO_ARY = (!ar) ? (status[2] ? 9'd241 : 9'd282) : 12'd0;
 localparam CONF_STR = {
 	"A.JOUST2;;",
 	"-;",
-	"H0O89,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
-	"H0O2,Orientation,Vert,Horz;",
-	"O35,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
+	"H0O[9:8]],Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
+	"H0O[2]],Orientation,Vert,Horz;",
+	"O[5:3],Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
-	"OA,Advance,Off,On;",
-	"OB,Auto Up,Off,On;",
-	"OC,High Score Reset,Off,On;",
+	"O[10],Advance,Off,On;",
+	"O[11],Auto Up,Off,On;",
+	"OC[12],High Score Reset,Off,On;",
 	"-;",
-	"R0,Reset;",
+	"R[0],Reset;",
 	"J1,Flap,Transform(Start),Coin;",
 	"jn,A,Start,Select,R,L;",
 	"V,v",`BUILD_DATE 
@@ -233,9 +233,9 @@ wire [24:0] ioctl_addr;
 wire [ 7:0] ioctl_dout;
 wire [15:0] ioctl_index;
 
-wire [ 1:0] buttons;
-wire [31:0] status;
-wire [10:0] ps2_key;
+wire [  1:0] buttons;
+wire [127:0] status;
+wire [ 10:0] ps2_key;
 
 wire [15:0] joy1,joy2;
 wire [15:0] joy = joy1 | joy2;
