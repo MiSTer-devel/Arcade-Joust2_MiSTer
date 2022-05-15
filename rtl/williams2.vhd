@@ -1229,10 +1229,10 @@ begin
 		hblank <= '0';
 	end if;
 
-	if    vcnt = 504 then
+	if    vcnt = 503 then
 		vblank <= '1';
-	elsif vcnt = 262 then
-		vblank <= '0'; 
+	elsif vcnt = 261 then
+		vblank <= '0';
 	end if;
 
 
