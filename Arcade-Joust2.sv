@@ -213,6 +213,8 @@ localparam CONF_STR = {
 	"H0O[2]],Orientation,Vert,Horz;",
 	"O[5:3],Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
+	"O[13],Swap Joysticks,No,Yes;",
+	"-;",
 	"O[10],Advance,Off,On;",
 	"O[11],Auto Up,Off,On;",
 	"OC[12],High Score Reset,Off,On;",
@@ -298,6 +300,8 @@ wire m_flap_2  = joy2[4];
 wire m_start2  = joy2[5];
 
 wire m_coin    = joy[6];
+
+wire joy_swap = status[13];
 
 // DISPLAY
 wire hblank, vblank;
@@ -390,16 +394,16 @@ williams2 williams2
 	.btn_high_score_reset(status[12]),
 
 	.btn_coin(m_coin),
-	.btn_start_1(m_start1),
-	.btn_start_2(m_start2),
+	.btn_start_1(~joy_swap ? m_start1 : m_start2),
+	.btn_start_2(~joy_swap ? m_start2 : m_start1),
 
-	.btn_left_1(m_left_1),
-	.btn_right_1(m_right_1),
-	.btn_trigger1_1(m_flap_1),
+	.btn_left_1(~joy_swap ? m_left_1 : m_left_2),
+	.btn_right_1(~joy_swap ? m_right_1 : m_right_2),
+	.btn_trigger1_1(~joy_swap ? m_flap_1 : m_flap_2),
 	
-	.btn_left_2(m_left_2),
-	.btn_right_2(m_right_2),
-	.btn_trigger1_2(m_flap_2),
+	.btn_left_2(~joy_swap ? m_left_2 : m_left_1),
+	.btn_right_2(~joy_swap ? m_right_2 : m_right_1),
+	.btn_trigger1_2(~joy_swap ? m_flap_2 : m_flap_1),
 
 	.sw_cocktail_table(), // not implemented yet by dar
 	.seven_seg(), // [7:0] 
