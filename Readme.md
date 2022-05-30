@@ -1,6 +1,6 @@
 # [Arcade: Joust 2](https://en.wikipedia.org/wiki/Joust_2:_Survival_of_the_Fittest) for [MiSTer](https://mister-devel.github.io/MkDocs_MiSTer/)
 
-![Joust 2 Logo](Joust2Logo.png)
+![Joust 2 Logo](doc/Joust2Logo.png)
 
 Original core developed by [darfpga](https://github.com/darfpga)
 
@@ -14,7 +14,7 @@ Original source is located in `doc/`
 
 ## Controls
 
-![Joust 2 Controls](controls.jpg)
+![Joust 2 Controls](doc/controls.jpg)
 
 | Name  | Description         |
 | ----- | ------------------- |
