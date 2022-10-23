@@ -366,9 +366,10 @@ arcade_video #(313,24,1) arcade_video
 );
 
 
-wire [7:0] audio;
-assign AUDIO_L = {audio, 6'd0};
-assign AUDIO_R = AUDIO_L;
+wire [13:0] audio_l;
+wire [13:0] audio_r;
+assign AUDIO_L = audio_l;
+assign AUDIO_R = audio_r;
 assign AUDIO_S = 0;
 
 williams2 williams2
@@ -389,7 +390,8 @@ williams2 williams2
 	.video_hs(hs),
 	.video_vs(vs),
 
-	.audio_out(audio),
+	.audio_l(audio_l),
+	.audio_r(audio_r),
 
 	.btn_auto_up(status[10]),
 	.btn_advance(status[11]),

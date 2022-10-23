@@ -1,6 +1,12 @@
-set_global_assignment -name SDC_FILE Arcade-Joust2.sdc
 set_global_assignment -name SYSTEMVERILOG_FILE Arcade-Joust2.sv
 
+set_global_assignment -name VHDL_FILE rtl/tools/joust2_unzip/joust2_bg_sound_bank_c.vhd
+set_global_assignment -name VHDL_FILE rtl/tools/joust2_unzip/joust2_bg_sound_bank_b.vhd
+set_global_assignment -name VHDL_FILE rtl/tools/joust2_unzip/joust2_bg_sound_bank_a.vhd
+set_global_assignment -name QIP_FILE rtl/jt51/hdl/jt51.qip
+set_global_assignment -name VERILOG_FILE rtl/mc6809/mc6809is.v
+set_global_assignment -name VHDL_FILE rtl/williams_cvsd_board.vhd
+set_global_assignment -name VHDL_FILE rtl/hc55564.vhd
 set_global_assignment -name VHDL_FILE rtl/cpu09l_128.vhd
 set_global_assignment -name VHDL_FILE rtl/cpu68_2.vhd
 set_global_assignment -name VHDL_FILE rtl/decodeur_7_seg.vhd

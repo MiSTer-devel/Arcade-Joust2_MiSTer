@@ -68,7 +68,8 @@ port(
 	video_hs             : out std_logic;
 	video_vs             : out std_logic;
 
-	audio_out            : out std_logic_vector( 7 downto 0);
+	audio_l              : out std_logic_vector(13 downto 0);
+	audio_r              : out std_logic_vector(13 downto 0);
 
 	btn_auto_up          : in  std_logic;
 	btn_advance          : in  std_logic; 
@@ -256,6 +257,13 @@ architecture struct of williams2 is
 	signal sound_select : std_logic_vector(7 downto 0);
 	signal sound_trig   : std_logic;
 	signal sound_ack    : std_logic;
+	signal sound_trig_2 : std_logic; -- cvsd board trigger
+
+	signal audio_1      : std_logic_vector(7 downto 0);
+	signal audio_2      : std_logic_vector(7 downto 0);
+	signal speech       : std_logic_vector(15 downto 0);
+	signal ym2151_left  : unsigned (15 downto 0);
+	signal ym2151_right : unsigned (15 downto 0);
 
 	signal sound_cpu_addr : std_logic_vector(15 downto 0);
 
@@ -1173,7 +1181,7 @@ port map
 	pa_oe    => open,
 	ca1      => cnt_4ms, -- '0',
 	ca2_i    => '0',
-	ca2_o    => open,
+	ca2_o    => sound_trig_2,
 	ca2_oe   => open,
 	pb_i     => (others => '0'),
 	pb_o     => sound_select,
@@ -1261,9 +1269,47 @@ port map(
 	sound_select => sound_select,
 	sound_trig   => sound_trig, 
 	sound_ack    => sound_ack,
-	audio_out    => audio_out,
+	audio_out    => audio_1,
 
 	dbg_cpu_addr => sound_cpu_addr
 );
+
+
+-- Williams cvsd board
+williams2 : entity work.williams_cvsd_board
+port map(
+ clock_12     => clock_12,
+ reset        => reset,
+ 
+ sound_select => sound_select,
+ sound_trig   => sound_trig_2,
+
+ audio        => audio_2,
+ speech       => speech,
+ ym2151_left  => ym2151_left,
+ ym2151_right => ym2151_right,
+
+ dbg_out => open
+
+);
+
+
+-- pwm sound output (rough mux)
+process(clock_12)  -- use same clock as sound_board
+begin
+  if rising_edge(clock_12) then
+		audio_l  <=  std_logic_vector(
+			  unsigned("00" & ym2151_left(15 downto 4))
+			+ unsigned("0" & speech(15 downto 3))
+         + unsigned("0000" & audio_1 & "00")
+         + unsigned("0000" & audio_2 & "00"));
+			
+		audio_r  <=  std_logic_vector(
+			  unsigned("00" & ym2151_right(15 downto 4))
+			+ unsigned("0" & speech(15 downto 3))
+         + unsigned("0000" & audio_1 & "00")
+         + unsigned("0000" & audio_2 & "00"));
+  end if;
+end process;
 
 end struct;
