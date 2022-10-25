@@ -49,6 +49,11 @@ entity williams_cvsd_board is
 port(
  clock_12     : in std_logic;
  reset        : in std_logic;
+
+ -- MiSTer rom loading
+ dn_addr      : in  std_logic_vector(18 downto 0);
+ dn_data      : in  std_logic_vector( 7 downto 0);
+ dn_wr        : in  std_logic;
  
  sound_select : in std_logic_vector(7 downto 0);
  sound_trig   : in std_logic;
@@ -181,6 +186,10 @@ end component mc6809is;
  signal alt       : std_logic := '0';
  signal cen_1p78  : std_logic := '0';
  signal cen_3p57  : std_logic := '0';
+ 
+ signal rom_bank_a_cs : std_logic;
+ signal rom_bank_b_cs : std_logic;
+ signal rom_bank_c_cs : std_logic;
  
 begin
 
@@ -340,27 +349,69 @@ port map (
 );
 
 -- rom0 IC_U4
-bank_a_rom : entity work.joust2_bg_sound_bank_a
-port map(
- clk  => clock_12,
- addr => cpu_addr(14 downto 0),
- data => rom_bank_a_do
+--bank_a_rom : entity work.joust2_bg_sound_bank_a
+--port map(
+-- clk  => clock_12,
+-- addr => cpu_addr(14 downto 0),
+-- data => rom_bank_a_do
+--);
+
+rom_bank_a_cs <= '1' when dn_addr(18 downto 15) = "1000" else '0'; -- dn 40000-47FFF
+bank_a_rom : work.dpram generic map (8,15)
+port map
+(
+	clk_a  => clock_12,
+	we_a   => dn_wr and rom_bank_a_cs,
+	addr_a => dn_addr(14 downto 0),
+	d_a    => dn_data,
+
+	clk_b  => clock_12,
+	addr_b => cpu_addr(14 downto 0),
+	q_b    => rom_bank_a_do
 );
 
 -- rom1 IC_U19
-bank_b_rom : entity work.joust2_bg_sound_bank_b
-port map(
- clk  => clock_12,
- addr => cpu_addr(14 downto 0),
- data => rom_bank_b_do
+--bank_b_rom : entity work.joust2_bg_sound_bank_b
+--port map(
+-- clk  => clock_12,
+-- addr => cpu_addr(14 downto 0),
+-- data => rom_bank_b_do
+--);
+
+rom_bank_b_cs <= '1' when dn_addr(18 downto 15) = "1001" else '0'; -- dn 48000-4FFFF
+bank_b_rom : work.dpram generic map (8,15)
+port map
+(
+	clk_a  => clock_12,
+	we_a   => dn_wr and rom_bank_b_cs,
+	addr_a => dn_addr(14 downto 0),
+	d_a    => dn_data,
+
+	clk_b  => clock_12,
+	addr_b => cpu_addr(14 downto 0),
+	q_b    => rom_bank_b_do
 );
 
 -- rom2 IC_U20
-bank_c_rom : entity work.joust2_bg_sound_bank_c
-port map(
- clk  => clock_12,
- addr => cpu_addr(14 downto 0),
- data => rom_bank_c_do
+--bank_c_rom : entity work.joust2_bg_sound_bank_c
+--port map(
+-- clk  => clock_12,
+-- addr => cpu_addr(14 downto 0),
+-- data => rom_bank_c_do
+--);
+
+rom_bank_c_cs <= '1' when dn_addr(18 downto 15) = "1010" else '0'; -- dn 50000-57FFF
+bank_c_rom : work.dpram generic map (8,15)
+port map
+(
+	clk_a  => clock_12,
+	we_a   => dn_wr and rom_bank_c_cs,
+	addr_a => dn_addr(14 downto 0),
+	d_a    => dn_data,
+
+	clk_b  => clock_12,
+	addr_b => cpu_addr(14 downto 0),
+	q_b    => rom_bank_c_do
 );
 
 -- sram IC U3

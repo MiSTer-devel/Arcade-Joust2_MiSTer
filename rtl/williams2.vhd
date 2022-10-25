@@ -54,7 +54,7 @@ port(
 	rom_rd               : out std_logic;
 
 	-- MiSTer rom loading
-	dn_addr              : in  std_logic_vector(17 downto 0);
+	dn_addr              : in  std_logic_vector(18 downto 0);
 	dn_data              : in  std_logic_vector( 7 downto 0);
 	dn_wr                : in  std_logic;
 
@@ -808,7 +808,7 @@ port map(
 --  data => rom_prog1_do
 -- );
 
-rom_prog1_cs <= '1' when dn_addr(17 downto 12) = "111101" else '0';
+rom_prog1_cs <= '1' when dn_addr(18 downto 12) = "0111101" else '0';
 prog1_rom : work.dpram generic map (8,12)
 port map
 (
@@ -829,7 +829,7 @@ port map
 -- 	data => rom_prog2_do
 -- );
 
-rom_prog2_cs <= '1' when dn_addr(17 downto 13) = "11000" else '0';
+rom_prog2_cs <= '1' when dn_addr(18 downto 13) = "011000" else '0';
 prog2_rom : work.dpram generic map (8,13)
 port map
 (
@@ -852,7 +852,7 @@ port map
 -- 	data => rom_bank_a_do
 -- );
 
-rom_bank_a_cs <= '1' when dn_addr(17 downto 15) = "010" else '0';
+rom_bank_a_cs <= '1' when dn_addr(18 downto 15) = "0010" else '0';
 bank_a_rom : work.dpram generic map (8,15)
 port map
 (
@@ -874,7 +874,7 @@ port map
 -- 	data => rom_bank_b_do
 -- );
 
-rom_bank_b_cs <= '1' when dn_addr(17 downto 15) = "011" else '0';
+rom_bank_b_cs <= '1' when dn_addr(18 downto 15) = "0011" else '0';
 bank_b_rom : work.dpram generic map (8,15)
 port map
 (
@@ -896,7 +896,7 @@ port map
 -- 	data => rom_bank_c_do
 -- );
 
-rom_bank_c_cs <= '1' when dn_addr(17 downto 15) = "100" else '0';
+rom_bank_c_cs <= '1' when dn_addr(18 downto 15) = "0100" else '0';
 bank_c_rom : work.dpram generic map (8,15)
 port map
 (
@@ -918,7 +918,7 @@ port map
 -- 	data => rom_bank_d_do
 -- );
 
-rom_bank_d_cs <= '1' when dn_addr(17 downto 15) = "101" else '0';
+rom_bank_d_cs <= '1' when dn_addr(18 downto 15) = "0101" else '0';
 bank_d_rom : work.dpram generic map (8,15)
 port map
 (
@@ -940,7 +940,7 @@ port map
 --  data => graph1_do
 -- );
 
-rom_graph1_cs <= '1' when dn_addr(17 downto 14) = "0000" else '0';
+rom_graph1_cs <= '1' when dn_addr(18 downto 14) = "00000" else '0';
 graph1_rom : work.dpram generic map (8,14)
 port map
 (
@@ -962,7 +962,7 @@ port map
 --  data => graph2_do
 -- );
 
-rom_graph2_cs <= '1' when dn_addr(17 downto 14) = "0001" else '0';
+rom_graph2_cs <= '1' when dn_addr(18 downto 14) = "00001" else '0';
 graph2_rom : work.dpram generic map (8,14)
 port map
 (
@@ -984,7 +984,7 @@ port map
 --  data => graph3_do
 -- );
 
-rom_graph3_cs <= '1' when dn_addr(17 downto 14) = "0010" else '0';
+rom_graph3_cs <= '1' when dn_addr(18 downto 14) = "00010" else '0';
 graph3_rom : work.dpram generic map (8,14)
 port map
 (
@@ -1120,7 +1120,7 @@ port map(
 	q    => cmos_do
 );
 
-rom_decoder_cs <= '1' when dn_addr(17 downto 9) = "111111000" else '0';
+rom_decoder_cs <= '1' when dn_addr(18 downto 9) = "0111111000" else '0';
 video_addr_decoder : work.dpram generic map (8,9)
 port map
 (
@@ -1280,6 +1280,10 @@ williams2 : entity work.williams_cvsd_board
 port map(
  clock_12     => clock_12,
  reset        => reset,
+ 
+ dn_addr      => dn_addr,
+ dn_data      => dn_data,
+ dn_wr        => dn_wr,
  
  sound_select => sound_select,
  sound_trig   => sound_trig_2,

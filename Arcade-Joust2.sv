@@ -377,7 +377,7 @@ williams2 williams2
 	.clock_12(clk_12),
 	.reset(reset),
 
-	.dn_addr(ioctl_addr[17:0]),
+	.dn_addr(ioctl_addr[18:0]),
 	.dn_data(ioctl_dout),
 	.dn_wr(ioctl_wr && ioctl_index==0),
 
