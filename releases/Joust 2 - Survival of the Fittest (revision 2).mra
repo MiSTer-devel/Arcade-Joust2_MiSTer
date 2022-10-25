@@ -6,7 +6,7 @@
   <version></version>
   <alternative></alternative>
   <platform>Williams 2nd Generation</platform>
-  <series>Joust</series>
+  <series>Joust 2</series>
   <year>1986</year>
   <manufacturer>Williams</manufacturer>
   <category>Platform</category>
@@ -38,7 +38,7 @@
     <!-- joust2_graph3     16kib [17:14] "0010"   08000-0BFFF -->
     <part crc="c41e3daa" name="vid_27128_ic41_rom22_rev1.9d"/>
 
-    <!-- padding           16kib [17:15] "0011"   0C000-0FFFF -->
+    <!-- padding           16kib                  0C000-0FFFF -->
     <part repeat="16384">0</part>
 
     <!-- joust2_bank_a     32kib [17:15] "010"    10000-17FFF -->
@@ -63,33 +63,45 @@
     <part crc="3e01b597" name="cpu_2732_ic17_rom10_rev1.8i"/>
     <part crc="ff26fb29" name="cpu_2732_ic15_rom8_rev1.8g"/>
     <part crc="5f107db5" name="cpu_2732_ic13_rom6_rev2.6i"/>
-    <!-- Padding            8kib [17:15] "101"    2E000-2FFFF -->
+    <!-- Padding            8kib                  2E000-2FFFF -->
     <part repeat="8192">0</part>
 
-    <!-- joust2_prog2      32kib [17:13] "11000"  30000-31FFF -->
+    <!-- joust2_prog2      8kib [17:13] "11000"  30000-31FFF -->
     <part crc="951175ce" name="cpu_2732_ic9_rom3_rev2.4d"/>
     <part crc="ba6e0f6c" name="cpu_2732_ic10_rom4_rev2.4f"/>
 
-    <!-- Padding           16kib [17:13] "11001"  32000-35FFF -->
+    <!-- Padding           16kib                  32000-35FFF -->
     <part repeat="16384">0</part>
 
     <!-- joust2_sound       8kib [17:14] "1101"   36000-37FFF -->
     <part crc="84517c3c" name="cpu_2764_ic8_rom1_rev1.0f"/>
 
-    <!-- Padding           20kib [17:14] "1110"   38000-3CFFF  -->
+    <!-- Padding           20kib                  38000-3CFFF  -->
     <part repeat="20480">0</part>
 
     <!-- joust2_prog1       4kib [17:12] "111101" 3D000-3DFFF  -->
     <part crc="08b0d5bd" name="cpu_2732_ic55_rom2_rev1.4c"/>
 
-    <!-- Padding            4kib [17:12] "111110" 3E000-3EFFF -->
+    <!-- Padding            4kib                  3E000-3EFFF -->
     <part repeat="4096">0</part>
 
-    <!-- joust2_decoder     512b [17:12] "111111" 3FFA0-4019F -->
+    <!-- joust2_decoder     512b [17: 9] "111111000" 3F000-3F1FF -->
     <part crc="0ea3f7fb" name="vid_82s147a_ic60_a-5282-10292.12f"/>
+
+    <!-- Padding           3584b                  3F200-3FFFF -->
+    <part repeat="3584">0</part>
+
+    <!-- joust2_bg_sound_bank_a  32kib  [18:15] "1000" 40000-47FFF -->
+    <part crc="3AF6B47D" name="snd_27256_rom23_rev1.u4"/>
+
+    <!-- joust2_bg_sound_bank_b  32kib  [18:15] "1001" 48000-4FFFF -->
+    <part crc="E7F9ED2E" name="snd_27256_rom24_rev1.u19"/>
+
+    <!-- joust2_bg_sound_bank_c  32kib  [18:15] "1010" 50000-57FFF -->
+    <part crc="C85B29F7" name="snd_27256_rom25_rev1.u20"/>
 
   </rom>
   
-  <mratimestamp>20220426031332</mratimestamp>
+  <mratimestamp>20221025214200</mratimestamp>
 
 </misterromdescription>
