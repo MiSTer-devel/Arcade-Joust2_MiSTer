@@ -35,7 +35,7 @@ port(
 	reset        : in  std_logic;
 
 	-- MiSTer rom loading
-	dn_addr      : in  std_logic_vector(17 downto 0);
+	dn_addr      : in  std_logic_vector(18 downto 0);
 	dn_data      : in  std_logic_vector( 7 downto 0);
 	dn_wr        : in  std_logic;
 
@@ -162,7 +162,7 @@ port map(
 
 -- cpu_2764_ic8_rom1_rev1.0f (84517c3c)
 -- soundcpu 32000-33FFF
-rom_sound_cs <= '1' when dn_addr(17 downto 13) = "11011" else '0';
+rom_sound_cs <= '1' when dn_addr(18 downto 13) = "011011" else '0';
 cpu_prog_rom : work.dpram generic map (8,13)
 port map
 (

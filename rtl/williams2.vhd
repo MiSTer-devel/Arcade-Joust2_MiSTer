@@ -54,7 +54,7 @@ port(
 	rom_rd               : out std_logic;
 
 	-- MiSTer rom loading
-	dn_addr              : in  std_logic_vector(17 downto 0);
+	dn_addr              : in  std_logic_vector(18 downto 0);
 	dn_data              : in  std_logic_vector( 7 downto 0);
 	dn_wr                : in  std_logic;
 
@@ -68,7 +68,8 @@ port(
 	video_hs             : out std_logic;
 	video_vs             : out std_logic;
 
-	audio_out            : out std_logic_vector( 7 downto 0);
+	audio_l              : out std_logic_vector(13 downto 0);
+	audio_r              : out std_logic_vector(13 downto 0);
 
 	btn_auto_up          : in  std_logic;
 	btn_advance          : in  std_logic; 
@@ -256,6 +257,13 @@ architecture struct of williams2 is
 	signal sound_select : std_logic_vector(7 downto 0);
 	signal sound_trig   : std_logic;
 	signal sound_ack    : std_logic;
+	signal sound_trig_2 : std_logic; -- cvsd board trigger
+
+	signal audio_1      : std_logic_vector(7 downto 0);
+	signal audio_2      : std_logic_vector(7 downto 0);
+	signal speech       : std_logic_vector(15 downto 0);
+	signal ym2151_left  : unsigned (15 downto 0);
+	signal ym2151_right : unsigned (15 downto 0);
 
 	signal sound_cpu_addr : std_logic_vector(15 downto 0);
 
@@ -800,7 +808,7 @@ port map(
 --  data => rom_prog1_do
 -- );
 
-rom_prog1_cs <= '1' when dn_addr(17 downto 12) = "111101" else '0';
+rom_prog1_cs <= '1' when dn_addr(18 downto 12) = "0111101" else '0';
 prog1_rom : work.dpram generic map (8,12)
 port map
 (
@@ -821,7 +829,7 @@ port map
 -- 	data => rom_prog2_do
 -- );
 
-rom_prog2_cs <= '1' when dn_addr(17 downto 13) = "11000" else '0';
+rom_prog2_cs <= '1' when dn_addr(18 downto 13) = "011000" else '0';
 prog2_rom : work.dpram generic map (8,13)
 port map
 (
@@ -844,7 +852,7 @@ port map
 -- 	data => rom_bank_a_do
 -- );
 
-rom_bank_a_cs <= '1' when dn_addr(17 downto 15) = "010" else '0';
+rom_bank_a_cs <= '1' when dn_addr(18 downto 15) = "0010" else '0';
 bank_a_rom : work.dpram generic map (8,15)
 port map
 (
@@ -866,7 +874,7 @@ port map
 -- 	data => rom_bank_b_do
 -- );
 
-rom_bank_b_cs <= '1' when dn_addr(17 downto 15) = "011" else '0';
+rom_bank_b_cs <= '1' when dn_addr(18 downto 15) = "0011" else '0';
 bank_b_rom : work.dpram generic map (8,15)
 port map
 (
@@ -888,7 +896,7 @@ port map
 -- 	data => rom_bank_c_do
 -- );
 
-rom_bank_c_cs <= '1' when dn_addr(17 downto 15) = "100" else '0';
+rom_bank_c_cs <= '1' when dn_addr(18 downto 15) = "0100" else '0';
 bank_c_rom : work.dpram generic map (8,15)
 port map
 (
@@ -910,7 +918,7 @@ port map
 -- 	data => rom_bank_d_do
 -- );
 
-rom_bank_d_cs <= '1' when dn_addr(17 downto 15) = "101" else '0';
+rom_bank_d_cs <= '1' when dn_addr(18 downto 15) = "0101" else '0';
 bank_d_rom : work.dpram generic map (8,15)
 port map
 (
@@ -932,7 +940,7 @@ port map
 --  data => graph1_do
 -- );
 
-rom_graph1_cs <= '1' when dn_addr(17 downto 14) = "0000" else '0';
+rom_graph1_cs <= '1' when dn_addr(18 downto 14) = "00000" else '0';
 graph1_rom : work.dpram generic map (8,14)
 port map
 (
@@ -954,7 +962,7 @@ port map
 --  data => graph2_do
 -- );
 
-rom_graph2_cs <= '1' when dn_addr(17 downto 14) = "0001" else '0';
+rom_graph2_cs <= '1' when dn_addr(18 downto 14) = "00001" else '0';
 graph2_rom : work.dpram generic map (8,14)
 port map
 (
@@ -976,7 +984,7 @@ port map
 --  data => graph3_do
 -- );
 
-rom_graph3_cs <= '1' when dn_addr(17 downto 14) = "0010" else '0';
+rom_graph3_cs <= '1' when dn_addr(18 downto 14) = "00010" else '0';
 graph3_rom : work.dpram generic map (8,14)
 port map
 (
@@ -1112,7 +1120,7 @@ port map(
 	q    => cmos_do
 );
 
-rom_decoder_cs <= '1' when dn_addr(17 downto 9) = "111111000" else '0';
+rom_decoder_cs <= '1' when dn_addr(18 downto 9) = "0111111000" else '0';
 video_addr_decoder : work.dpram generic map (8,9)
 port map
 (
@@ -1173,7 +1181,7 @@ port map
 	pa_oe    => open,
 	ca1      => cnt_4ms, -- '0',
 	ca2_i    => '0',
-	ca2_o    => open,
+	ca2_o    => sound_trig_2,
 	ca2_oe   => open,
 	pb_i     => (others => '0'),
 	pb_o     => sound_select,
@@ -1261,9 +1269,51 @@ port map(
 	sound_select => sound_select,
 	sound_trig   => sound_trig, 
 	sound_ack    => sound_ack,
-	audio_out    => audio_out,
+	audio_out    => audio_1,
 
 	dbg_cpu_addr => sound_cpu_addr
 );
+
+
+-- Williams cvsd board
+williams2 : entity work.williams_cvsd_board
+port map(
+ clock_12     => clock_12,
+ reset        => reset,
+ 
+ dn_addr      => dn_addr,
+ dn_data      => dn_data,
+ dn_wr        => dn_wr,
+ 
+ sound_select => sound_select,
+ sound_trig   => sound_trig_2,
+
+ audio        => audio_2,
+ speech       => speech,
+ ym2151_left  => ym2151_left,
+ ym2151_right => ym2151_right,
+
+ dbg_out => open
+
+);
+
+
+-- pwm sound output (rough mux)
+process(clock_12)  -- use same clock as sound_board
+begin
+  if rising_edge(clock_12) then
+		audio_l  <=  std_logic_vector(
+			  unsigned("00" & ym2151_left(15 downto 4))
+			+ unsigned("0" & speech(15 downto 3))
+         + unsigned("0000" & audio_1 & "00")
+         + unsigned("0000" & audio_2 & "00"));
+			
+		audio_r  <=  std_logic_vector(
+			  unsigned("00" & ym2151_right(15 downto 4))
+			+ unsigned("0" & speech(15 downto 3))
+         + unsigned("0000" & audio_1 & "00")
+         + unsigned("0000" & audio_2 & "00"));
+  end if;
+end process;
 
 end struct;
