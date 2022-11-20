@@ -393,8 +393,8 @@ williams2 williams2
 	.audio_l(audio_l),
 	.audio_r(audio_r),
 
-	.btn_auto_up(status[10]),
-	.btn_advance(status[11]),
+	.btn_auto_up(status[11]),
+	.btn_advance(status[10]),
 	.btn_high_score_reset(status[12]),
 
 	.btn_coin(m_coin),
