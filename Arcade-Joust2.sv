@@ -205,9 +205,9 @@ assign VIDEO_ARY = (!ar) ? (status[2] ? 9'd241 : 9'd282) : 12'd0;
 // 0         1         2         3          4         5         6
 // 01234567890123456789012345678901 23456789012345678901234567890123
 // 0123456789ABCDEFGHIJKLMNOPQRSTUV 0123456789ABCDEFGHIJKLMNOPQRSTUV
-// X XXXX  XXXXX
+// X XXXX  XXXXXX
 
-`include "build_id.v" 
+`include "build_id.v"
 localparam CONF_STR = {
 	"A.JOUST2;;",
 	"-;",
@@ -219,12 +219,12 @@ localparam CONF_STR = {
 	"-;",
 	"O[10],Advance,Off,On;",
 	"O[11],Auto Up,Off,On;",
-	"OC[12],High Score Reset,Off,On;",
+	"O[12],High Score Reset,Off,On;",
 	"-;",
 	"R[0],Reset;",
 	"J1,Flap,Transform(Start),Coin;",
 	"jn,A,Start,Select,R,L;",
-	"V,v",`BUILD_DATE 
+	"V,v",`BUILD_DATE
 };
 
 wire        forced_scandoubler;
@@ -365,7 +365,6 @@ arcade_video #(313,24,1) arcade_video
 	.fx(status[5:3])
 );
 
-
 wire [13:0] audio_l;
 wire [13:0] audio_r;
 assign AUDIO_L = audio_l;
@@ -404,13 +403,13 @@ williams2 williams2
 	.btn_left_1(~joy_swap ? m_left_1 : m_left_2),
 	.btn_right_1(~joy_swap ? m_right_1 : m_right_2),
 	.btn_trigger1_1(~joy_swap ? m_flap_1 : m_flap_2),
-	
+
 	.btn_left_2(~joy_swap ? m_left_2 : m_left_1),
 	.btn_right_2(~joy_swap ? m_right_2 : m_right_1),
 	.btn_trigger1_2(~joy_swap ? m_flap_2 : m_flap_1),
 
 	.sw_cocktail_table(), // not implemented yet by dar
-	.seven_seg(), // [7:0] 
+	.seven_seg(), // [7:0]
 
 	.dbg_out() // [31:0]
 );
