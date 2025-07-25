@@ -1,0 +1,25 @@
+<mamecheat version="1">
+
+  <cheat desc="Enemies Die On Contact">
+    <script state="run">
+      <action>maincpu.mw@1331E=2002</action> <!-- This ROM cheat was made by nolberto82 -->
+    </script>
+    <script state="off">
+      <action>maincpu.mw@1331E=2718</action>
+    </script>
+  </cheat>
+
+  <cheat desc="P1 Infinite Lives">
+    <script state="run">
+      <action>maincpu.pw@A059=0405</action>
+    </script>
+  </cheat>
+
+  <cheat desc="P2 Infinite Lives">
+    <script state="run">
+      <action>maincpu.pw@A063=0405</action>
+    </script>
+  </cheat>
+
+</mamecheat>
+<!-- Cheat file downloaded from http://www.mamecheat.co.uk, see cheat.txt for list of contributors. -->
