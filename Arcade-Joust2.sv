@@ -215,8 +215,9 @@ assign VIDEO_ARY = (!ar) ? (status[2] ? 9'd241 : 9'd282) : 12'd0;
 localparam CONF_STR = {
 	"A.JOUST2;;",
 	"-;",
-	"H0O[9:8]],Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
-	"H0O[2]],Orientation,Vert,Horz;",
+	"H0O[9:8],Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
+	"H0O[2],Orientation,Vert,Horz;",
+	"H0D1O[6],Screen Rotate,On,Off;",
 	"O[5:3],Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
 	"O[13],Swap Joysticks,No,Yes;",
@@ -258,7 +259,7 @@ hps_io #(.CONF_STR(CONF_STR)) hps_io
 
 	.buttons(buttons),
 	.status(status),
-	.status_menumask({direct_video}),
+	.status_menumask({status[2],direct_video}),
 
 	.forced_scandoubler(forced_scandoubler),
 	.video_rotated(video_rotated),
@@ -348,8 +349,8 @@ always @(posedge clk_48) begin
 	ce_pix <= !div;
 end
 
-wire no_rotate  = status[2] | direct_video ;
-wire rotate_ccw = 1;
+wire no_rotate  = status[2]  | direct_video;
+wire rotate_ccw = ~status[6] | direct_video;
 wire flip       = 0;
 
 screen_rotate screen_rotate (.*);
