@@ -39,3 +39,4 @@ c5_pin_model_dump.txt
 *.cdf
 **/.DS_Store
 roms/*
+*.Identifier
