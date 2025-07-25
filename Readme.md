@@ -45,10 +45,10 @@ High Score reset is another internal button, and it makes the game pause for a s
 * Regular sound effects play fine.
 * 2 Player controls work.
 * Pause functionality implemented with video dimming support.
+* NVRAM autosave support for high scores and game settings.
 
 ## To-Do
 
-* HiScore saving not implemented yet.
 * Savestates not implemented yet.
 * Arcade cheats not implemented yet.
 
