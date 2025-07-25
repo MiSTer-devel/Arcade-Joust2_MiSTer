@@ -25,6 +25,8 @@ Original source is located in `doc/`
 
 There is a 1P Start and a 2P Start. These are also called "Transform" in-game.
 
+The OSD menu includes a "Swap Joysticks" option to reverse Player 1 and Player 2 controls.
+
 ## Service Menu
 
 Joust 2 had a peculiar system of DIPs. See the manual in `doc/` for the original source of the information.
@@ -45,11 +47,9 @@ High Score reset is another internal button, and it makes the game pause for a s
 
 ## To-Do
 
-* No Speech synthesis or Music yet.
 * Pause not implemented.
 * HiScore saving not implemented yet.
-* MiSTer DIP system not implemented yet (DIPS are defined away as CPU behavior currently in the PIA due to them not being a standard DIP system)
-* Adjust video output for HDMI, it is up and to the right a line or two.
+* Savestates not implemented yet.
 
 ## ROM Files Instructions
 
