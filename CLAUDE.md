@@ -27,7 +27,7 @@ This project uses Intel Quartus Prime (version 17.0) for FPGA synthesis and plac
 
 ### Key Directories
 - `rtl/` - Core hardware description files (VHDL/Verilog)
-- `sys/` - MiSTer system files and framework components  
+- `sys/` - MiSTer system files and framework components  (DO NOT MODIFY ANY OF THESE)
 - `doc/` - Documentation, ROM information, and reference materials
 - `releases/` - Binary releases (.rbf files and .mra arcade definitions)
 
