@@ -48,6 +48,7 @@ entity williams2 is
 port(
 	clock_12             : in  std_logic;
 	reset                : in  std_logic;
+	pause_cpu            : in  std_logic;
 
 	rom_addr             : out std_logic_vector(16 downto 0);
 	rom_do               : in  std_logic_vector( 7 downto 0);
@@ -656,7 +657,7 @@ else
 
 		-- sync cpu_halt in the middle of cpu cycle
 		if video_access = '1' then
-			cpu_halt <= blit_halt;
+			cpu_halt <= blit_halt or pause_cpu;
 		end if;
 		
 		--	intialize blit

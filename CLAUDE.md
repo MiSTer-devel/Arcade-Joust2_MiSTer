@@ -59,8 +59,8 @@ This project uses Intel Quartus Prime (version 17.0) for FPGA synthesis and plac
 - Video timing matches original 15kHz arcade monitors
 - Sound system includes both sound effects, music synthesis, and speech synthesis
 - The codebase maintains separation between MiSTer framework code (`sys/`) and core arcade logic (`rtl/`)
+- Pause functionality implemented with CPU halting and video dimming support
 
 ## Known Limitations
-- Pause functionality not implemented  
 - HiScore saving not implemented
 - MiSTer DIP system not fully integrated (handled via CPU behavior)

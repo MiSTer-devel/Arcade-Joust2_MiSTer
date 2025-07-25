@@ -44,10 +44,10 @@ High Score reset is another internal button, and it makes the game pause for a s
 * Both revisions of Joust 2: Survival of the Fittest load and play fine.
 * Regular sound effects play fine.
 * 2 Player controls work.
+* Pause functionality implemented with video dimming support.
 
 ## To-Do
 
-* Pause not implemented.
 * HiScore saving not implemented yet.
 * Savestates not implemented yet.
 * Arcade cheats not implemented yet.

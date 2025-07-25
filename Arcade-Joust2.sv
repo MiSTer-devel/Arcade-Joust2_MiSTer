@@ -222,13 +222,17 @@ localparam CONF_STR = {
 	"-;",
 	"O[13],Swap Joysticks,No,Yes;",
 	"-;",
+	"P1,Pause options;",
+	"P1O[25],Pause when OSD is open,On,Off;",
+	"P1O[26],Dim video after 10s,On,Off;",
+	"-;",
 	"O[10],Advance,Off,On;",
 	"O[11],Auto Up,Off,On;",
 	"O[12],High Score Reset,Off,On;",
 	"-;",
 	"R[0],Reset;",
-	"J1,Flap,Transform(Start),Coin;",
-	"jn,A,Start,Select,R,L;",
+	"J1,Flap,Transform(Start),Coin,Pause;",
+	"jn,A,Start,Select,R,L,X;",
 	"V,v",`BUILD_DATE
 };
 
@@ -307,6 +311,7 @@ wire m_flap_2  = joy2[4];
 wire m_start2  = joy2[5];
 
 wire m_coin    = joy[6];
+wire m_pause   = joy[7];
 
 wire joy_swap = status[13];
 
@@ -342,6 +347,25 @@ always @(posedge clk_48) begin : colorPalette
     bi = ~| intensity ? 8'd0 : color_lut[{b, intensity}];
 end
 
+// Pause functionality
+wire [23:0] pause_rgb;
+wire pause_cpu;
+
+pause #(8,8,8,12) pause
+(
+	.clk_sys(clk_12),
+	.reset(reset),
+	.user_button(m_pause),
+	.pause_request(1'b0), // No high score module pause request yet
+	.options(~status[26:25]),
+	.OSD_STATUS(OSD_STATUS),
+	.r(ri),
+	.g(gi),
+	.b(bi),
+	.pause_cpu(pause_cpu),
+	.rgb_out(pause_rgb)
+);
+
 reg ce_pix;
 always @(posedge clk_48) begin
 	reg [2:0] div;
@@ -361,7 +385,7 @@ arcade_video #(313,24,1) arcade_video
 
 	.clk_video(clk_48),
 
-	.RGB_in({ri[7:0],gi[7:0],bi[7:0]}),
+	.RGB_in(pause_rgb),
 	.HBlank(hblank),
 	.VBlank(vblank),
 	.HSync(~hs),
@@ -380,6 +404,7 @@ williams2 williams2
 (
 	.clock_12(clk_12),
 	.reset(reset),
+	.pause_cpu(pause_cpu),
 
 	.dn_addr(ioctl_addr[18:0]),
 	.dn_data(ioctl_dout),
