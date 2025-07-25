@@ -48,6 +48,7 @@ This project uses Intel Quartus Prime (version 17.0) for FPGA synthesis and plac
 ### File Organization
 - VHDL files use `.vhd` extension for hardware description
 - SystemVerilog uses `.sv` extension  
+- Verilog uses `.v` extension
 - Quartus-specific files: `.qpf`, `.qsf`, `.qip`, `.sdc`
 - Build system uses Tcl scripts in `sys/` directory
 
@@ -56,11 +57,10 @@ This project uses Intel Quartus Prime (version 17.0) for FPGA synthesis and plac
 - The project implements the original Williams hardware behavior including the unique DIP switch system
 - ROM files are loaded via `.mra` (MRA = MiSTer Rom Alternative) files
 - Video timing matches original 15kHz arcade monitors
-- Sound system includes both sound effects and music synthesis (though speech synthesis is not yet implemented)
+- Sound system includes both sound effects, music synthesis, and speech synthesis
 - The codebase maintains separation between MiSTer framework code (`sys/`) and core arcade logic (`rtl/`)
 
 ## Known Limitations
-- Speech synthesis not implemented
 - Pause functionality not implemented  
 - HiScore saving not implemented
 - MiSTer DIP system not fully integrated (handled via CPU behavior)
