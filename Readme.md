@@ -50,6 +50,7 @@ High Score reset is another internal button, and it makes the game pause for a s
 * Pause not implemented.
 * HiScore saving not implemented yet.
 * Savestates not implemented yet.
+* Arcade cheats not implemented yet.
 
 ## ROM Files Instructions
 
