@@ -60,7 +60,7 @@ This project uses Intel Quartus Prime (version 17.0) for FPGA synthesis and plac
 - Sound system includes both sound effects, music synthesis, and speech synthesis
 - The codebase maintains separation between MiSTer framework code (`sys/`) and core arcade logic (`rtl/`)
 - Pause functionality implemented with CPU halting and video dimming support
+- NVRAM autosave module for preserving high scores and CMOS settings
 
 ## Known Limitations
-- HiScore saving not implemented
 - MiSTer DIP system not fully integrated (handled via CPU behavior)
