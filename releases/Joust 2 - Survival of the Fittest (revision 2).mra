@@ -102,6 +102,9 @@
 
   </rom>
   
+  <!-- NVRAM -->
+  <nvram index="4" size="1024"/>
+  
   <mratimestamp>20221025214200</mratimestamp>
 
 </misterromdescription>

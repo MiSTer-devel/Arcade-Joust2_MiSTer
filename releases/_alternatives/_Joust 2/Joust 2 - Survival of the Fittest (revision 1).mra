@@ -89,5 +89,8 @@
     <part crc="0ea3f7fb" name="vid_82s147a_ic60_a-5282-10292.12f"/>
 
   </rom>
+  
+  <!-- NVRAM -->
+  <nvram index="4" size="1024"/>
 
 </misterromdescription>

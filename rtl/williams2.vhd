@@ -58,6 +58,7 @@ port(
 	dn_addr              : in  std_logic_vector(18 downto 0);
 	dn_data              : in  std_logic_vector( 7 downto 0);
 	dn_wr                : in  std_logic;
+	dn_index             : in  std_logic_vector( 7 downto 0);
 
 	-- tv15Khz_mode : in std_logic;
 	video_r              : out std_logic_vector( 3 downto 0);
@@ -89,6 +90,10 @@ port(
  
 	sw_cocktail_table     : in  std_logic;
 	seven_seg            : out std_logic_vector( 7 downto 0);
+
+	-- NVRAM interface for high score save/load
+	nvram_addr           : in  std_logic_vector( 9 downto 0);
+	nvram_data_out       : out std_logic_vector( 3 downto 0);
 
 	dbg_out              : out std_logic_vector(31 downto 0)
 
@@ -159,6 +164,15 @@ architecture struct of williams2 is
 
 	signal cmos_do : std_logic_vector(3 downto 0);
 	signal cmos_we : std_logic;
+	signal cmos_ram_addr : std_logic_vector(9 downto 0);
+	signal cmos_ram_do : std_logic_vector(3 downto 0);
+	
+	-- NVRAM loading signals
+	signal nvram_load_we : std_logic;
+	signal cmos_ram_we : std_logic;
+	signal cmos_ram_din : std_logic_vector(3 downto 0);
+	signal rom_load_enable : std_logic;
+	signal nvram_load_enable : std_logic;
 
 	signal palette_addr  : std_logic_vector(9 downto 0);
 	signal palette_lo_we : std_logic;
@@ -281,6 +295,29 @@ architecture struct of williams2 is
 	signal rom_decoder_cs : std_logic;
 
 begin
+
+-- NVRAM interface concurrent assignments
+-- Mux CMOS address between CPU access and external NVRAM access
+-- When CPU is paused, allow external access for NVRAM module
+-- When loading NVRAM data, use the download address
+-- NVRAM loading logic
+-- Check if we're loading ROM data (dn_index = 0) or NVRAM data (dn_index = 4)
+rom_load_enable <= '1' when dn_index = x"00" else '0';
+nvram_load_enable <= '1' when dn_index = x"04" else '0';
+nvram_load_we <= dn_wr and nvram_load_enable;
+
+-- Address and data muxing for CMOS RAM
+-- Simple 1:1 mapping - each save file byte maps to one CMOS address (lower 4 bits)
+cmos_ram_addr <= dn_addr(9 downto 0) when nvram_load_we = '1' else
+                 nvram_addr when pause_cpu = '1' else 
+                 addr_bus(9 downto 0);
+
+cmos_ram_we <= nvram_load_we or (cmos_we and (not pause_cpu));
+cmos_ram_din <= dn_data(3 downto 0) when nvram_load_we = '1' else data_bus(3 downto 0);
+
+-- Connect outputs
+cmos_do <= cmos_ram_do;
+nvram_data_out <= cmos_ram_do;
 
 -- for debug
 process (clock_12) 
@@ -814,7 +851,7 @@ prog1_rom : work.dpram generic map (8,12)
 port map
 (
 	clk_a => clock_12,
-	we_a => dn_wr and rom_prog1_cs,
+	we_a => dn_wr and rom_prog1_cs and rom_load_enable,
 	addr_a => dn_addr(11 downto 0),
 	d_a => dn_data,
 
@@ -835,7 +872,7 @@ prog2_rom : work.dpram generic map (8,13)
 port map
 (
 	clk_a => clock_12,
-	we_a => dn_wr and rom_prog2_cs,
+	we_a => dn_wr and rom_prog2_cs and rom_load_enable,
 	addr_a => dn_addr(12 downto 0),
 	d_a => dn_data,
 
@@ -858,7 +895,7 @@ bank_a_rom : work.dpram generic map (8,15)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_bank_a_cs,
+	we_a   => dn_wr and rom_bank_a_cs and rom_load_enable,
 	addr_a => dn_addr(14 downto 0),
 	d_a    => dn_data,
 
@@ -880,7 +917,7 @@ bank_b_rom : work.dpram generic map (8,15)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_bank_b_cs,
+	we_a   => dn_wr and rom_bank_b_cs and rom_load_enable,
 	addr_a => dn_addr(14 downto 0),
 	d_a    => dn_data,
 
@@ -902,7 +939,7 @@ bank_c_rom : work.dpram generic map (8,15)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_bank_c_cs,
+	we_a   => dn_wr and rom_bank_c_cs and rom_load_enable,
 	addr_a => dn_addr(14 downto 0),
 	d_a    => dn_data,
 
@@ -924,7 +961,7 @@ bank_d_rom : work.dpram generic map (8,15)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_bank_d_cs,
+	we_a   => dn_wr and rom_bank_d_cs and rom_load_enable,
 	addr_a => dn_addr(14 downto 0),
 	d_a    => dn_data,
 
@@ -946,7 +983,7 @@ graph1_rom : work.dpram generic map (8,14)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_graph1_cs,
+	we_a   => dn_wr and rom_graph1_cs and rom_load_enable,
 	addr_a => dn_addr(13 downto 0),
 	d_a    => dn_data,
 
@@ -968,7 +1005,7 @@ graph2_rom : work.dpram generic map (8,14)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_graph2_cs,
+	we_a   => dn_wr and rom_graph2_cs and rom_load_enable,
 	addr_a => dn_addr(13 downto 0),
 	d_a    => dn_data,
 
@@ -990,7 +1027,7 @@ graph3_rom : work.dpram generic map (8,14)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_graph3_cs,
+	we_a   => dn_wr and rom_graph3_cs and rom_load_enable,
 	addr_a => dn_addr(13 downto 0),
 	d_a    => dn_data,
 
@@ -1115,10 +1152,10 @@ cmos_ram : entity work.joust2_cmos_ram
 generic map( dWidth => 4, aWidth => 10)
 port map(
 	clk  => clock_12,
-	we   => cmos_we,
-	addr => addr_bus(9 downto 0),
-	d    => data_bus(3 downto 0),
-	q    => cmos_do
+	we   => cmos_ram_we,
+	addr => cmos_ram_addr,
+	d    => cmos_ram_din,
+	q    => cmos_ram_do
 );
 
 rom_decoder_cs <= '1' when dn_addr(18 downto 9) = "0111111000" else '0';
@@ -1126,7 +1163,7 @@ video_addr_decoder : work.dpram generic map (8,9)
 port map
 (
 	clk_a  => clock_12,
-	we_a   => dn_wr and rom_decoder_cs,
+	we_a   => dn_wr and rom_decoder_cs and rom_load_enable,
 	addr_a => dn_addr(8 downto 0),
 	d_a    => dn_data,
 
@@ -1265,7 +1302,7 @@ port map(
 
 	dn_addr      => dn_addr,
 	dn_data      => dn_data,
-	dn_wr        => dn_wr,
+	dn_wr        => dn_wr and rom_load_enable,
 
 	sound_select => sound_select,
 	sound_trig   => sound_trig, 
