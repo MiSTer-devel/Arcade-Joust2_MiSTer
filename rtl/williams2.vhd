@@ -95,6 +95,13 @@ port(
 	nvram_addr           : in  std_logic_vector( 9 downto 0);
 	nvram_data_out       : out std_logic_vector( 3 downto 0);
 
+	-- Cheat engine interface
+	cpu_addr_out         : out std_logic_vector(15 downto 0);
+	cpu_rom_data_in      : in  std_logic_vector( 7 downto 0);
+	cpu_ram_data_in      : in  std_logic_vector( 7 downto 0);
+	cpu_rom_data_out     : out std_logic_vector( 7 downto 0);
+	cpu_ram_data_out     : out std_logic_vector( 7 downto 0);
+
 	dbg_out              : out std_logic_vector(31 downto 0)
 
 );
@@ -293,6 +300,10 @@ architecture struct of williams2 is
 	signal rom_prog1_cs   : std_logic;
 	signal rom_prog2_cs   : std_logic;
 	signal rom_decoder_cs : std_logic;
+
+	-- Cheat engine signals
+	signal original_rom_data : std_logic_vector(7 downto 0);
+	signal original_ram_data : std_logic_vector(7 downto 0);
 
 begin
 
@@ -590,11 +601,22 @@ data_bus_low <=
 	vram_h2_do & vram_l2_do when decod_do(7 downto 6)  = "10" else
 	X"00";
 
+-- Select original ROM data based on CPU address (not blitter address)
+original_rom_data <=
+	data_bus_high when cpu_addr(15 downto 12) >= X"D" else  -- High ROM area (0xD000-0xFFFF)
+	data_bus_low;  -- Banked ROM area (when rom_bank_cs active)
+
+-- Select original RAM data (VRAM and other RAM areas)
+original_ram_data <=
+	data_bus_low when cpu_addr(15 downto 12) < X"C" else  -- VRAM area (0x0000-0xBFFF) 
+	data_bus_high;  -- Other RAM-like areas (0xC000-0xCFFF)
+
 data_bus <=
 	cpu_do		  when cpu_rw_n  = '0' else
 	blit_data     when blit_rw_n = '0' else
-	data_bus_low  when addr_bus(15 downto 12) < x"C" else
-	data_bus_high;
+	cpu_ram_data_in when cpu_rw_n = '1' and cpu_addr(15 downto 12) < x"C" else  -- Use cheat-modified RAM data (CPU reads only)
+	cpu_rom_data_in when cpu_rw_n = '1' else  -- Use cheat-modified ROM data (CPU reads only)
+	data_bus_low;  -- Fallback for other cases
 
 process (clock_12)
 begin
@@ -602,6 +624,12 @@ begin
 		cpu_di <= data_bus;
 	end if;
 end process;
+
+-- Cheat engine connections
+cpu_addr_out     <= cpu_addr;
+-- Send original unmodified data to cheat engines (8-bit data)
+cpu_rom_data_out <= original_rom_data;  -- Original ROM data
+cpu_ram_data_out <= original_ram_data;  -- Original RAM data
 	
 -- misc. registers
 process (reset, clock_12)

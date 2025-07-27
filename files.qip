@@ -15,3 +15,4 @@ set_global_assignment -name VHDL_FILE rtl/pia6821.vhd
 set_global_assignment -name VHDL_FILE rtl/williams2.vhd
 set_global_assignment -name VERILOG_FILE rtl/pause.v
 set_global_assignment -name VERILOG_FILE rtl/nvram.v
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/cheatengine.sv
