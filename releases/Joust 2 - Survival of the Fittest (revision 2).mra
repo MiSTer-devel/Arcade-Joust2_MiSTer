@@ -27,13 +27,6 @@
   <num_buttons>2</num_buttons>
   <button_names></button_names>
 
-  <cheats>
-  <cheat name="Enemies Die On Contact">000000 10 0001332E 00000000 00002002</cheat>
-  <!-- <cheat name="Enemies Die On Contact off">000000 10 0001332E 00000000 00002718</cheat> -->
-  <cheat name="P1 Infinite Lives"     >000000 10 0000A059 00000000 00000405</cheat>
-  <cheat name="P2 Infinite Lives"     >000000 10 0000A063 00000000 00000405</cheat>
-  </cheats>
-
   <rom index="0" zip="joust2.zip" md5="none" type="merged">
 
     <!-- joust2_graph1     16kib [17:14] "0000"   00000-03FFF -->

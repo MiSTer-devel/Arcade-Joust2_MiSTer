@@ -220,7 +220,7 @@ localparam CONF_STR = {
 	"H0D1O[6],Screen Rotate,On,Off;",
 	"O[5:3],Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
 	"-;",
-	"C,Cheats;",
+	"O[13],Swap Joysticks,No,Yes;",
 	"-;",
 	"P1,Pause options;",
 	"P1O[25],Pause when OSD is open,On,Off;",
@@ -228,7 +228,6 @@ localparam CONF_STR = {
 	"-;",
 	"O[27],Autosave Hiscores,Off,On;",
 	"-;",
-	"O[13],Swap Joysticks,No,Yes;",
 	"O[10],Advance,Off,On;",
 	"O[11],Auto Up,Off,On;",
 	"O[12],High Score Reset,Off,On;",
@@ -442,55 +441,6 @@ assign AUDIO_L = audio_l;
 assign AUDIO_R = audio_r;
 assign AUDIO_S = 0;
 
-///////////////////////////////////////////////////
-reg [128:0] gg_code;
-wire        gg_available;
-wire        code_download = ioctl_download && (ioctl_index == 8'd255);
-
-// Code layout:
-// {clock bit, code flags,     32'b address, 32'b compare, 32'b replace}
-//  128        127:96          95:64         63:32         31:0
-// Integer values are in BIG endian byte order, so it up to the loader
-// or generator of the code to re-arrange them correctly.
-
-always_ff @(posedge clk_sys) begin
-	gg_code[128] <= 1'b0;
-
-	if (code_download & ioctl_wr) begin
-        gg_code[127:0] <= { gg_code[119:0], ioctl_dout }; // shift in next byte
-		gg_code[128]   <= &ioctl_addr[3:0];      // Clock it in if it's 16th byte
-	end
-end
-
-
-// CPU and ROM interface signals for cheat engine  
-wire [15:0] cpu_addr_from_williams2;
-wire [7:0] cpu_rom_data_to_cheat, cpu_ram_data_to_cheat;
-wire [7:0] cpu_rom_data_from_cheat, cpu_ram_data_from_cheat;
-cheatengine_32_8 #(.ADDR_WIDTH(16)) codes_rom
-(
-	.clk(clk_sys),
-	.reset(code_download && ioctl_wr && !ioctl_addr),
-	.enable(1),
-	.code(gg_code),
-	.available(),
-	.addr_in(cpu_addr_from_williams2),
-	.data_in(cpu_rom_data_to_cheat),
-	.data_out(cpu_rom_data_from_cheat)
-);
-
-cheatengine_32_8 #(.ADDR_WIDTH(16)) codes_ram
-(
-	.clk(clk_sys),
-	.reset(code_download && ioctl_wr && !ioctl_addr),
-	.enable(1),
-	.code(gg_code),
-	.available(),
-	.addr_in(cpu_addr_from_williams2),
-	.data_in(cpu_ram_data_to_cheat),
-	.data_out(cpu_ram_data_from_cheat)
-);
-
 williams2 williams2
 (
 	.clock_12(clk_12),
@@ -501,13 +451,6 @@ williams2 williams2
 	.dn_data(ioctl_dout),
 	.dn_wr(ioctl_wr && (ioctl_index==0 || ioctl_index==4)),
 	.dn_index(ioctl_index),
-
-	// Cheat engine interface
-	.cpu_addr_out(cpu_addr_from_williams2),
-	.cpu_rom_data_in(cpu_rom_data_from_cheat),
-	.cpu_ram_data_in(cpu_ram_data_from_cheat),
-	.cpu_rom_data_out(cpu_rom_data_to_cheat),
-	.cpu_ram_data_out(cpu_ram_data_to_cheat),
 
 	.video_r(r),
 	.video_g(g),
